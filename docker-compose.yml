@@ -3,9 +3,13 @@ services:
     build: .
     ports:
       - "3000:3000"
-    env_file: .env
+    env_file:
+      - .env.docker
     volumes:
       - sqlite_data:/app/data
+    environment:
+      - NODE_ENV=production
+      - DOCKER_ENV=true
 
 volumes:
   sqlite_data:

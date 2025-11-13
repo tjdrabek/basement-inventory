@@ -3,6 +3,19 @@ import { db } from "@/lib/db";
 import { items } from "@/db/schema";
 import { randomUUID } from "crypto";
 
+export async function GET() {
+  try {
+    const allItems = await db.select().from(items).all();
+    return NextResponse.json(allItems);
+  } catch (err) {
+    console.error("GET /api/items error:", err);
+    return NextResponse.json(
+      { error: "Failed to fetch items" },
+      { status: 500 }
+    );
+  }
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json();

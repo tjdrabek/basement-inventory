@@ -1,10 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Link from "next/link";
 
 import {
   Card,
@@ -31,7 +32,7 @@ import {
   SelectItem,
   SelectValue,
 } from "@/components/ui/select";
-import { Loader2 } from "lucide-react";
+import { Loader2, ArrowLeft } from "lucide-react";
 
 const ItemSchema = z.object({
   name: z.string().min(1, "Item name is required"),
@@ -43,10 +44,17 @@ const ItemSchema = z.object({
 
 type ItemFormData = z.infer<typeof ItemSchema>;
 
-export default function NewItemPage() {
+interface EditItemPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
+
+export default function EditItemPage({ params }: EditItemPageProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const [initialLoading, setInitialLoading] = useState(true);
+  const [itemId, setItemId] = useState<string>("");
   const [totes, setTotes] = useState<{ id: string; name: string }[]>([]);
 
   const form = useForm<ItemFormData>({
@@ -56,51 +64,101 @@ export default function NewItemPage() {
       brand: "",
       quantity: 1,
       description: "",
-      toteId: searchParams.get("toteId") || "",
+      toteId: "",
     },
   });
 
   useEffect(() => {
-    async function loadTotes() {
-      const res = await fetch("/api/totes");
-      const data = await res.json();
-      setTotes(data);
-    }
-    loadTotes();
+    async function loadItemAndTotes() {
+      try {
+        const { id } = await params;
+        setItemId(id);
 
-    // Set the toteId from search params if provided
-    const toteId = searchParams.get("toteId");
-    if (toteId) {
-      form.setValue("toteId", toteId);
+        // Load both item data and available totes
+        const [itemRes, totesRes] = await Promise.all([
+          fetch(`/api/items/${id}`),
+          fetch("/api/totes"),
+        ]);
+
+        if (!itemRes.ok) {
+          throw new Error("Failed to fetch item");
+        }
+
+        const item = await itemRes.json();
+        const totesData = await totesRes.json();
+
+        form.reset({
+          name: item.name,
+          brand: item.brand || "",
+          quantity: item.quantity,
+          description: item.description || "",
+          toteId: item.toteId || "",
+        });
+
+        setTotes(totesData);
+      } catch (error) {
+        console.error("Error loading item:", error);
+        alert("Failed to load item details");
+        router.push("/");
+      } finally {
+        setInitialLoading(false);
+      }
     }
-  }, [searchParams, form]);
+
+    loadItemAndTotes();
+  }, [params, form, router]);
 
   async function onSubmit(values: ItemFormData) {
     setLoading(true);
 
-    const res = await fetch("/api/items", {
-      method: "POST",
-      body: JSON.stringify(values),
-    });
+    try {
+      const res = await fetch(`/api/items/${itemId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(values),
+      });
 
-    if (!res.ok) {
-      alert("Error creating item.");
+      if (!res.ok) {
+        throw new Error("Failed to update item");
+      }
+
+      router.push(`/item/${itemId}`);
+    } catch (error) {
+      console.error("Error updating item:", error);
+      alert("Failed to update item");
+    } finally {
       setLoading(false);
-      return;
     }
+  }
 
-    router.push(`/tote/${values.toteId}`);
+  if (initialLoading) {
+    return (
+      <main className="min-h-screen flex items-center justify-center">
+        <Loader2 className="w-8 h-8 animate-spin" />
+      </main>
+    );
   }
 
   return (
-    <main className="min-h-screen p-6">
-      <div className="flex justify-center">
-        <Card className="w-full max-w-lg">
+    <main className="min-h-screen p-8">
+      <div className="max-w-2xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center gap-4 mb-8">
+          <Link
+            href={`/item/${itemId}`}
+            className="flex items-center gap-2 text-blue-600 hover:text-blue-800"
+          >
+            <ArrowLeft className="w-5 h-5" />
+            Back to Item
+          </Link>
+        </div>
+
+        <Card>
           <CardHeader>
-            <CardTitle>Add an Item</CardTitle>
-            <CardDescription>
-              Store an item and assign it to a tote.
-            </CardDescription>
+            <CardTitle>Edit Item</CardTitle>
+            <CardDescription>Update the details of this item.</CardDescription>
           </CardHeader>
 
           <CardContent>
@@ -116,7 +174,7 @@ export default function NewItemPage() {
                     <FormItem>
                       <FormLabel>Item Name</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input placeholder="Enter item name..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -130,7 +188,7 @@ export default function NewItemPage() {
                     <FormItem>
                       <FormLabel>Brand (optional)</FormLabel>
                       <FormControl>
-                        <Input {...field} />
+                        <Input placeholder="Enter brand name..." {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -179,20 +237,19 @@ export default function NewItemPage() {
                   )}
                 />
 
-                {/* TOTE SELECT */}
                 <FormField
                   control={form.control}
                   name="toteId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Select Tote</FormLabel>
+                      <FormLabel>Assign to Tote</FormLabel>
                       <Select
                         onValueChange={field.onChange}
-                        defaultValue={field.value}
+                        value={field.value}
                       >
                         <FormControl>
                           <SelectTrigger>
-                            <SelectValue placeholder="Choose a tote" />
+                            <SelectValue placeholder="Select a tote..." />
                           </SelectTrigger>
                         </FormControl>
                         <SelectContent>
@@ -208,13 +265,22 @@ export default function NewItemPage() {
                   )}
                 />
 
-                <Button type="submit" className="w-full" disabled={loading}>
-                  {loading ? (
-                    <Loader2 className="animate-spin w-4 h-4" />
-                  ) : (
-                    "Add Item"
-                  )}
-                </Button>
+                <div className="flex gap-3">
+                  <Button type="submit" disabled={loading}>
+                    {loading && (
+                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    )}
+                    Update Item
+                  </Button>
+
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => router.push(`/item/${itemId}`)}
+                  >
+                    Cancel
+                  </Button>
+                </div>
               </form>
             </Form>
           </CardContent>

@@ -5,14 +5,11 @@ import { eq } from "drizzle-orm";
 
 export async function GET(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const row = await db
-      .select()
-      .from(items)
-      .where(eq(items.id, params.id))
-      .limit(1);
+    const { id } = await params;
+    const row = await db.select().from(items).where(eq(items.id, id)).limit(1);
 
     if (row.length === 0) {
       return NextResponse.json({ error: "Item not found" }, { status: 404 });
@@ -30,9 +27,10 @@ export async function GET(
 
 export async function PUT(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await req.json();
 
     await db
@@ -44,7 +42,7 @@ export async function PUT(
         quantity: body.quantity,
         toteId: body.toteId,
       })
-      .where(eq(items.id, params.id));
+      .where(eq(items.id, id));
 
     return NextResponse.json({ success: true });
   } catch (err) {
@@ -58,10 +56,11 @@ export async function PUT(
 
 export async function DELETE(
   req: Request,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await db.delete(items).where(eq(items.id, params.id));
+    const { id } = await params;
+    await db.delete(items).where(eq(items.id, id));
     return NextResponse.json({ success: true });
   } catch (err) {
     console.error("DELETE item error:", err);

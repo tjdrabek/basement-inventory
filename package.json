@@ -7,11 +7,15 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "migrate": "drizzle-kit migrate",
-    "generate": "drizzle-kit generate",
-    "dev:local": "cross-env NODE_ENV=local next dev",
-    "dev:devserver": "cross-env NODE_ENV=devserver next dev",
-    "dev:remote": "cross-env NODE_ENV=production next dev"
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio",
+    "docker:build": "docker-compose build",
+    "docker:up": "docker-compose up",
+    "docker:dev": "docker-compose up --build",
+    "docker:down": "docker-compose down",
+    "setup": "npm run db:push"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

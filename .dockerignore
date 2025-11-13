@@ -1,63 +1,27 @@
-# Dependencies
+# Dependency directories
 node_modules
-npm-debug.log*
 
-# Next.js build outputs
-.next/
-out/
+# Next.js output
+.next
+out
 
-# Environment files
-.env*
+# Env files (do NOT copy secrets into Docker images)
+.env
+.env.local
+.env.*
 !.env.example
 
-# Development files
-.vscode/
-.idea/
-*.swp
-*.swo
-*~
+# Logs
+*.log
 
-# OS generated files
+# OS cruft
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
 # Git
-.git/
+.git
 .gitignore
-README.md
-
-# Docker
-Dockerfile*
-docker-compose*.yml
-.dockerignore
 
 # Testing
-coverage/
-.nyc_output/
-
-# Logs
-logs/
-*.log
-
-# Runtime data
-pids/
-*.pid
-*.seed
-*.pid.lock
-
-# Optional npm cache directory
-.npm
-
-# ESLint cache
-.eslintcache
-
-# TypeScript cache
-*.tsbuildinfo
-
-# Drizzle development files
-drizzle/migrations/
+coverage
+.nyc_output
