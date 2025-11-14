@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
@@ -43,7 +43,7 @@ const ItemSchema = z.object({
 
 type ItemFormData = z.infer<typeof ItemSchema>;
 
-export default function NewItemPage() {
+function NewItemForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
@@ -221,5 +221,13 @@ export default function NewItemPage() {
         </Card>
       </div>
     </main>
+  );
+}
+
+export default function NewItemPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <NewItemForm />
+    </Suspense>
   );
 }
