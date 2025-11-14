@@ -20,5 +20,5 @@ export async function generateToteQR(toteId: string) {
 
   await QRCode.toFile(qrPath, url);
 
-  return `/qrcodes/${toteId}.png`;
+  return `/api/qrcodes/${toteId}.png`;
 }

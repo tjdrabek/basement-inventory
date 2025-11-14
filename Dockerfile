@@ -36,19 +36,28 @@ RUN mkdir -p /app/data && chmod -R 755 /app/data /app/public/qr /app/public/qrco
 # Set runtime DATABASE_URL (will be overridden by docker-compose env)
 ENV DATABASE_URL="file:/app/data/db.sqlite"
 
-# Create startup script for database initialization
-RUN echo '#!/bin/sh' > /app/start.sh && \
-    echo 'echo "Initializing database schema..."' >> /app/start.sh && \
-    echo 'npm run db:push || echo "Database initialization failed"' >> /app/start.sh && \
-    echo 'echo "Starting Next.js application..."' >> /app/start.sh && \
-    echo 'exec npm start' >> /app/start.sh && \
-    chmod +x /app/start.sh
-
 EXPOSE 3000
 
 # Use non-root user for security
 RUN addgroup -g 1001 -S nodejs
 RUN adduser -S nextjs -u 1001
+
+# Create startup script for database initialization
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'set -e' >> /app/start.sh && \
+    echo 'echo "=== Initializing database schema ==="' >> /app/start.sh && \
+    echo 'if [ -n "$DATABASE_URL" ]; then' >> /app/start.sh && \
+    echo '  echo "DATABASE_URL: $DATABASE_URL"' >> /app/start.sh && \
+    echo '  npm run db:push' >> /app/start.sh && \
+    echo '  echo "=== Database initialization complete ==="' >> /app/start.sh && \
+    echo 'else' >> /app/start.sh && \
+    echo '  echo "ERROR: DATABASE_URL not set"' >> /app/start.sh && \
+    echo '  exit 1' >> /app/start.sh && \
+    echo 'fi' >> /app/start.sh && \
+    echo 'echo "=== Starting Next.js application ==="' >> /app/start.sh && \
+    echo 'exec npm start' >> /app/start.sh && \
+    chmod +x /app/start.sh
+
 RUN chown -R nextjs:nodejs /app
 USER nextjs
 

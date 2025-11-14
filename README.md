@@ -70,7 +70,7 @@ A simple household inventory system for tracking storage totes and the items ins
    cd basement-inventory
    ```
 
-2. **Set up Docker environment** (optional - uses defaults if skipped)
+2. **Set up Docker environment**
 
    ```bash
    npm run docker:setup  # Creates .env.docker from template

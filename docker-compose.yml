@@ -8,7 +8,7 @@ services:
       - .env.docker
     volumes:
       - basement_inventory_data:/app/data
-      - basement_inventory_qr:/app/public/qr
+      - basement_inventory_qr:/app/public/qrcodes
     environment:
       - NODE_ENV=production
       - DOCKER_ENV=true

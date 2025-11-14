@@ -1,0 +1,26 @@
+services:
+  basement-inventory-dev:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    container_name: basement-inventory-dev
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.docker
+    volumes:
+      - .:/app
+      - /app/node_modules
+      - /app/.next
+      - basement_inventory_data:/app/data
+      - basement_inventory_qr:/app/public/qrcodes
+    environment:
+      - NODE_ENV=development
+      - DOCKER_ENV=true
+    command: npm run dev
+
+volumes:
+  basement_inventory_data:
+    driver: local
+  basement_inventory_qr:
+    driver: local

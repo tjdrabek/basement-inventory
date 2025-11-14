@@ -1,0 +1,25 @@
+FROM node:20-alpine
+
+WORKDIR /app
+
+# Copy package files
+COPY package.json package-lock.json* ./
+
+# Install dependencies
+RUN npm ci
+
+# Create necessary directories
+RUN mkdir -p /app/data /app/public/qr /app/public/qrcodes
+
+# Set proper permissions
+RUN addgroup -g 1001 -S nodejs && \
+    adduser -S nextjs -u 1001 && \
+    chown -R nextjs:nodejs /app
+
+USER nextjs
+
+# Expose Next.js dev server port
+EXPOSE 3000
+
+# Development will be started via docker-compose command
+CMD ["npm", "run", "dev"]
