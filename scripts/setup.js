@@ -1,20 +1,27 @@
 #!/usr/bin/env node
 
 /* eslint-disable @typescript-eslint/no-require-imports */
-const fs = require("fs");
-const path = require("path");
+const { existsSync, copyFileSync, writeFileSync, mkdirSync } = require("fs");
+const { join } = require("path");
 const { execSync } = require("child_process");
 
 console.log("🏠 Basement Inventory Setup\n");
 
-// Check if .env exists
-const envPath = path.join(process.cwd(), ".env");
-const envExamplePath = path.join(process.cwd(), ".env.example");
+const cwd = process.cwd();
 
-if (!fs.existsSync(envPath)) {
-  if (fs.existsSync(envExamplePath)) {
+// Environment file setup
+const envPath = join(cwd, ".env");
+const envExamplePath = join(cwd, ".env.example");
+
+const createEnvFile = () => {
+  if (existsSync(envPath)) {
+    console.log("✅ .env file already exists");
+    return;
+  }
+
+  if (existsSync(envExamplePath)) {
     console.log("📋 Creating .env file from template...");
-    fs.copyFileSync(envExamplePath, envPath);
+    copyFileSync(envExamplePath, envPath);
     console.log("✅ .env file created");
   } else {
     console.log("⚠️  .env.example not found, creating basic .env...");
@@ -23,47 +30,54 @@ NEXT_PUBLIC_BASE_URL=http://localhost:3000
 BASE_URL=http://localhost:3000
 PORT=3000
 `;
-    fs.writeFileSync(envPath, basicEnv);
+    writeFileSync(envPath, basicEnv);
     console.log("✅ Basic .env file created");
   }
-} else {
-  console.log("✅ .env file already exists");
-}
+};
 
-// Create data directory if it doesn't exist
-const dataDir = path.join(process.cwd(), "data");
-if (!fs.existsSync(dataDir)) {
-  console.log("📁 Creating data directory...");
-  fs.mkdirSync(dataDir, { recursive: true });
-  console.log("✅ Data directory created");
-} else {
-  console.log("✅ Data directory already exists");
-}
+// Directory creation helper
+const createDirectory = (dirPath, name) => {
+  if (!existsSync(dirPath)) {
+    console.log(`📁 Creating ${name}...`);
+    mkdirSync(dirPath, { recursive: true });
+    console.log(`✅ ${name} created`);
+  } else {
+    console.log(`✅ ${name} already exists`);
+  }
+};
 
-// Create QR codes directory if it doesn't exist
-const qrDir = path.join(process.cwd(), "public", "qr");
-if (!fs.existsSync(qrDir)) {
-  console.log("📁 Creating QR codes directory...");
-  fs.mkdirSync(qrDir, { recursive: true });
-  console.log("✅ QR codes directory created");
-} else {
-  console.log("✅ QR codes directory already exists");
-}
+// Setup process
+createEnvFile();
 
-// Initialize database
-console.log("🗃️  Initializing database...");
-try {
-  execSync("npm run db:push", { stdio: "inherit" });
-  console.log("✅ Database initialized successfully");
-} catch (error) {
-  console.error("❌ Failed to initialize database:", error.message);
-  console.log("Note: This may be normal if dependencies aren't installed yet.");
-  console.log("Run 'npm run db:push' manually after 'npm install'");
-}
+// Create required directories
+createDirectory(join(cwd, "data"), "data directory");
+createDirectory(join(cwd, "public", "qr"), "QR codes directory");
 
-console.log("\n🎉 Setup complete!");
-console.log("\nNext steps:");
-console.log('1. Run "npm run dev" to start the development server');
-console.log("2. Open http://localhost:3000 in your browser");
-console.log("3. Start adding your totes and items!");
-console.log('\nFor Docker: run "docker-compose up" instead');
+// Database initialization
+const initializeDatabase = () => {
+  console.log("🗃️  Initializing database...");
+  try {
+    execSync("npm run db:push", { stdio: "inherit" });
+    console.log("✅ Database initialized successfully");
+  } catch (error) {
+    console.error("❌ Failed to initialize database:", error.message);
+    console.log(
+      "Note: This may be normal if dependencies aren't installed yet."
+    );
+    console.log("Run 'npm run db:push' manually after 'npm install'");
+  }
+};
+
+// Run setup
+initializeDatabase();
+
+const displayCompletionMessage = () => {
+  console.log("\n🎉 Setup complete!");
+  console.log("\nNext steps:");
+  console.log('1. Run "npm run dev" to start the development server');
+  console.log("2. Open http://localhost:3000 in your browser");
+  console.log("3. Start adding your totes and items!");
+  console.log('\nFor Docker: run "docker-compose up" instead');
+};
+
+displayCompletionMessage();
