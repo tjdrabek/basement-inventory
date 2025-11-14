@@ -54,6 +54,7 @@ next-env.d.ts
 
 # QR code images (regenerated automatically)
 /public/qr/
+/public/qrcodes/
 
 # Logs
 logs
