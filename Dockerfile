@@ -23,8 +23,9 @@ RUN npm run db:push || echo "Build database initialization completed"
 # Build the application
 RUN npm run build
 
-# Remove devDependencies after build to reduce image size
+# Remove devDependencies after build but keep TypeScript for next.config.ts
 RUN npm prune --production
+RUN npm install typescript@5.9.3 --save-prod
 
 # Clean up temporary build database
 RUN rm -f /tmp/build.db
