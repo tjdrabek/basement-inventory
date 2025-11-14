@@ -14,10 +14,11 @@ out
 
 # Local development data - DO NOT COPY
 data/
-db/
+db/migrations/
 *.sqlite
 *.sqlite3
 *.db
+!db/schema.ts
 
 # QR codes (regenerated automatically)
 public/qr/
