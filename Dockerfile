@@ -14,17 +14,29 @@ COPY . .
 # Create necessary directories
 RUN mkdir -p /app/data /app/public/qr /app/public/qrcodes
 
+# Set temporary DATABASE_URL for build process
+ENV DATABASE_URL="file:/tmp/build.db"
+
+# Initialize temporary database schema for build
+RUN npm run db:push || echo "Build database initialization completed"
+
 # Build the application
 RUN npm run build
 
 # Remove devDependencies after build to reduce image size
 RUN npm prune --production
 
+# Clean up temporary build database
+RUN rm -f /tmp/build.db
+
 # Initialize database schema (creates empty database)
-RUN npm run db:push || echo "Database initialization completed"
+RUN DATABASE_URL="file:/app/data/db.sqlite" npm run db:push || echo "Database initialization completed"
 
 # Set proper permissions
 RUN chmod -R 755 /app/data /app/public/qr /app/public/qrcodes
+
+# Set runtime DATABASE_URL (will be overridden by docker-compose env)
+ENV DATABASE_URL="file:/app/data/db.sqlite"
 
 EXPOSE 3000
 
