@@ -23,21 +23,25 @@ RUN npm run db:push || echo "Build database initialization completed"
 # Build the application
 RUN npm run build
 
-# Remove devDependencies after build but keep TypeScript for next.config.ts
+# Remove devDependencies after build to reduce image size
 RUN npm prune --production
-RUN npm install typescript@5.9.3 --save
 
 # Clean up temporary build database
 RUN rm -f /tmp/build.db
 
-# Initialize database schema (creates empty database)
-RUN mkdir -p /app/data && DATABASE_URL="file:/app/data/db.sqlite" npm run db:push && echo "Database schema initialized successfully" || echo "Database initialization failed but continuing"
-
-# Set proper permissions
-RUN chmod -R 755 /app/data /app/public/qr /app/public/qrcodes
+# Set proper permissions for data directory
+RUN mkdir -p /app/data && chmod -R 755 /app/data /app/public/qr /app/public/qrcodes
 
 # Set runtime DATABASE_URL (will be overridden by docker-compose env)
 ENV DATABASE_URL="file:/app/data/db.sqlite"
+
+# Create startup script for database initialization
+RUN echo '#!/bin/sh' > /app/start.sh && \
+    echo 'echo "Initializing database schema..."' >> /app/start.sh && \
+    echo 'npm run db:push || echo "Database initialization failed"' >> /app/start.sh && \
+    echo 'echo "Starting Next.js application..."' >> /app/start.sh && \
+    echo 'exec npm start' >> /app/start.sh && \
+    chmod +x /app/start.sh
 
 EXPOSE 3000
 
@@ -47,4 +51,4 @@ RUN adduser -S nextjs -u 1001
 RUN chown -R nextjs:nodejs /app
 USER nextjs
 
-CMD ["npm", "start"]
+CMD ["/app/start.sh"]
