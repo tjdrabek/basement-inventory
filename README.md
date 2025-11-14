@@ -32,6 +32,18 @@ A simple household inventory system for tracking storage totes and the items ins
 3. **Set up environment**
 
    ```bash
+   npm run setup
+   ```
+
+   _This automatically creates .env from .env.example_
+
+   **Or manually:**
+
+   ```bash
+   # Windows
+   copy .env.example .env
+
+   # macOS/Linux
    cp .env.example .env
    ```
 

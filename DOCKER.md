@@ -67,8 +67,10 @@ ports:
 # Create custom Docker environment
 npm run docker:setup
 
-# Edit settings
-nano .env.docker
+# Edit settings (use your preferred editor)
+# Windows: notepad .env.docker
+# macOS/Linux: nano .env.docker or vim .env.docker
+notepad .env.docker
 
 # Restart with new settings
 docker-compose down
@@ -91,8 +93,11 @@ docker-compose exec basement-inventory-app npm run db:studio
 
 ```bash
 # Check what's using port 3000
-lsof -i :3000  # macOS/Linux
-netstat -ano | findstr :3000  # Windows
+# Windows
+netstat -ano | findstr :3000
+
+# macOS/Linux
+lsof -i :3000
 
 # Change port in docker-compose.yml
 ```

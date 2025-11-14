@@ -12,7 +12,7 @@
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",
     "setup": "node scripts/setup.js",
-    "docker:setup": "cp .env.docker.example .env.docker",
+    "docker:setup": "node -e \"const fs=require('fs'); if(fs.existsSync('.env.docker.example')&&!fs.existsSync('.env.docker')) fs.copyFileSync('.env.docker.example','.env.docker'); console.log('✅ .env.docker created from template')\"",
     "docker:build": "docker-compose build",
     "docker:up": "docker-compose up -d",
     "docker:dev": "docker-compose up --build",

@@ -23,7 +23,17 @@ npm install
 The application will automatically create a `.env` file from the template during installation. If you need to modify it:
 
 ```bash
-# Edit .env file if needed
+# Option 1: Use the setup script (recommended)
+npm run setup
+
+# Option 2: Manual copy
+# Windows Command Prompt
+copy .env.example .env
+
+# Windows PowerShell
+Copy-Item .env.example .env
+
+# macOS/Linux
 cp .env.example .env
 ```
 
@@ -63,6 +73,19 @@ npm run db:push
 chmod +x scripts/setup.js
 ```
 
+### Windows-Specific Issues
+
+```cmd
+# If you get execution policy errors in PowerShell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser
+
+# Run setup directly with Node
+node scripts/setup.js
+
+# If 'copy' command fails, use PowerShell
+Copy-Item .env.example .env
+```
+
 ### Docker Issues
 
 ```bash
@@ -74,10 +97,18 @@ docker-compose up --build
 ### Clear Everything and Start Over
 
 ```bash
-# Remove all local data
-rm -rf data/
-rm -rf .next/
-rm -rf node_modules/
+# Windows (Command Prompt)
+rmdir /s data
+rmdir /s .next
+rmdir /s node_modules
+npm install
+
+# Windows (PowerShell)
+Remove-Item -Recurse -Force data, .next, node_modules -ErrorAction SilentlyContinue
+npm install
+
+# macOS/Linux
+rm -rf data/ .next/ node_modules/
 npm install
 ```
 
