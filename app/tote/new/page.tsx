@@ -63,60 +63,65 @@ export default function NewTotePage() {
   }
 
   return (
-    <main className="min-h-screen flex justify-center p-6">
-      <Card className="w-full max-w-lg">
-        <CardHeader>
-          <CardTitle>Create a Tote</CardTitle>
-          <CardDescription>
-            Add a new storage tote and generate a QR code.
-          </CardDescription>
-        </CardHeader>
+    <main className="min-h-screen p-6">
+      <div className="flex justify-center">
+        <Card className="w-full max-w-lg">
+          <CardHeader>
+            <CardTitle>Create a Tote</CardTitle>
+            <CardDescription>
+              Add a new storage tote and generate a QR code.
+            </CardDescription>
+          </CardHeader>
 
-        <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Tote Name</FormLabel>
-                    <FormControl>
-                      <Input placeholder="Winter Clothes" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <CardContent>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-6"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Tote Name</FormLabel>
+                      <FormControl>
+                        <Input placeholder="Winter Clothes" {...field} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description (optional)</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        placeholder="Any notes about this tote..."
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                <FormField
+                  control={form.control}
+                  name="description"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Description (optional)</FormLabel>
+                      <FormControl>
+                        <Textarea
+                          placeholder="Any notes about this tote..."
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
 
-              <Button type="submit" className="w-full" disabled={loading}>
-                {loading ? (
-                  <Loader2 className="animate-spin w-4 h-4" />
-                ) : (
-                  "Create Tote"
-                )}
-              </Button>
-            </form>
-          </Form>
-        </CardContent>
-      </Card>
+                <Button type="submit" className="w-full" disabled={loading}>
+                  {loading ? (
+                    <Loader2 className="animate-spin w-4 h-4" />
+                  ) : (
+                    "Create Tote"
+                  )}
+                </Button>
+              </form>
+            </Form>
+          </CardContent>
+        </Card>
+      </div>
     </main>
   );
 }

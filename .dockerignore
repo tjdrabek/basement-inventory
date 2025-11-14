@@ -10,6 +10,17 @@ out
 .env.local
 .env.*
 !.env.example
+!.env.docker.example
+
+# Local development data - DO NOT COPY
+data/
+db/
+*.sqlite
+*.sqlite3
+*.db
+
+# QR codes (regenerated automatically)
+public/qr/
 
 # Logs
 *.log
@@ -17,6 +28,14 @@ out
 # OS cruft
 .DS_Store
 Thumbs.db
+
+# Git
+.git
+.gitignore
+
+# Development files
+README.md
+SETUP.md
 
 # Git
 .git

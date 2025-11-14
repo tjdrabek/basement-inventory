@@ -1,15 +1,36 @@
+version: "3.8"
+
 services:
-  web:
+  basement-inventory:
     build: .
+    container_name: basement-inventory-app
     ports:
       - "3000:3000"
     env_file:
       - .env.docker
     volumes:
-      - sqlite_data:/app/data
+      - basement_inventory_data:/app/data
+      - basement_inventory_qr:/app/public/qr
     environment:
       - NODE_ENV=production
       - DOCKER_ENV=true
+    restart: unless-stopped
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "wget",
+          "--no-verbose",
+          "--tries=1",
+          "--spider",
+          "http://localhost:3000",
+        ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 volumes:
-  sqlite_data:
+  basement_inventory_data:
+    driver: local
+  basement_inventory_qr:
+    driver: local

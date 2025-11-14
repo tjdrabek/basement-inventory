@@ -44,3 +44,17 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local development data - DO NOT COMMIT
+/data/
+/db/
+*.sqlite
+*.sqlite3
+*.db
+
+# QR code images (regenerated automatically)
+/public/qr/
+
+# Logs
+logs
+*.log
